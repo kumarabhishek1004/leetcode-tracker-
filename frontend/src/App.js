@@ -12,6 +12,9 @@ function App() {
   // loading state to prevent double submit
   const [loading, setLoading] = useState(false);
 
+  // state to store edited ratings (for Update button)
+  const [editRatings, setEditRatings] = useState({});
+
   // fetch problems when component loads
   useEffect(() => {
     fetchProblems();
@@ -19,22 +22,53 @@ function App() {
 
   // function to fetch problems from backend
   const fetchProblems = () => {
-    fetch('/api/problems') // uses proxy
+    fetch('/api/problems')
       .then(res => res.json())
       .then(data => setProblems(data))
       .catch(err => console.log(err));
   };
 
+  // delete a problem by id
+  const deleteProblem = (id) => {
+    const ok = window.confirm('Are you sure you want to delete this problem?');
+    if (!ok) return;
+
+    fetch(`/api/problems/${id}`, {
+      method: 'DELETE'
+    })
+      .then(res => res.json())
+      .then(() => {
+        fetchProblems();
+      })
+      .catch(err => console.log(err));
+  };
+
+  // update rating of a problem
+  const updateRating = (id, newRating) => {
+    fetch(`/api/problems/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        rating: Number(newRating)
+      })
+    })
+      .then(res => res.json())
+      .then(() => {
+        fetchProblems();
+      })
+      .catch(err => console.log(err));
+  };
+
   // function runs when form is submitted
   const handleSubmit = (e) => {
-    e.preventDefault(); // stop page refresh
+    e.preventDefault();
 
-    // prevent double click / duplicate submit
     if (loading) return;
-
     setLoading(true);
 
-    fetch('/api/problems', { // uses proxy
+    fetch('/api/problems', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -47,17 +81,14 @@ function App() {
     })
       .then(res => res.json())
       .then(() => {
-        // clear form inputs after success
         setTitle('');
         setDifficulty('');
         setRating('');
-
-        // reload problems list
         fetchProblems();
       })
       .catch(err => console.log(err))
       .finally(() => {
-        setLoading(false); // re-enable button
+        setLoading(false);
       });
   };
 
@@ -105,6 +136,44 @@ function App() {
         {problems.map(problem => (
           <li key={problem._id}>
             {problem.title} - {problem.difficulty} - Rating: {problem.rating}
+
+            {/* rating input */}
+            <input
+              type="number"
+              min="1"
+              max="5"
+              value={editRatings[problem._id] ?? problem.rating}
+              style={{ width: '50px', marginLeft: '10px' }}
+              onChange={(e) =>
+                setEditRatings({
+                  ...editRatings,
+                  [problem._id]: e.target.value
+                })
+              }
+            />
+
+            {/* update button */}
+            <button
+               type ="button"
+              style={{ marginLeft: '6px' }}
+              onClick={() =>
+                updateRating(
+                  problem._id,
+                  editRatings[problem._id] ?? problem.rating
+                )
+              }
+            >
+              Update
+            </button>
+
+
+            {/* delete button */}
+            <button
+              style={{ marginLeft: '6px' }}
+              onClick={() => deleteProblem(problem._id)}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
@@ -113,4 +182,3 @@ function App() {
 }
 
 export default App;
- 

@@ -1,51 +1,30 @@
 const express = require('express');
 const router = express.Router();
 
-const { addProblem,getAllProblems,deleteProblem,updateRating } = require('../controllers/problemController');
-
-
-// temporary in-memory storage
-let problems = [];
+const {
+  addProblem,
+  getAllProblems,
+  deleteProblem,
+  updateRating
+} = require('../controllers/problemcontroller');
 
 /*
-  DELETE: delete a problem by id
+  DELETE: delete a problem by id (MongoDB)
 */
-router.delete('/:id' ,deleteProblem);
+router.delete('/:id', deleteProblem);
 
 /*
-  PATCH: update rating
+  PATCH: update rating (MongoDB)
 */
-router.patch('/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const { rating } = req.body;
-
-  // validate rating
-  if (rating < 1 || rating > 5) {
-    return res.status(400).json({
-      message: 'Rating must be between 1 and 5'
-    });
-  }
-
-  // find problem
-  const problem = problems.find(p => p.id === id);
-
-  if (!problem) {
-    return res.status(404).json({ message: 'Problem not found' });
-  }
-
-  // update rating
-  problem.rating = rating;
-
-  res.json(problem);
-});
+router.patch('/:id', updateRating);
 
 /*
-  POST: add new problem
+  POST: add new problem (MongoDB)
 */
 router.post('/', addProblem);
 
 /*
-  GET: get all problems
+  GET: get all problems (MongoDB)
 */
 router.get('/', getAllProblems);
 
