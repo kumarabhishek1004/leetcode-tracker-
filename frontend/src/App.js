@@ -1,26 +1,21 @@
 import { useEffect, useState } from 'react';
 
 function App() {
-  // state to store problems list from backend
+  // ================= STATES =================
   const [problems, setProblems] = useState([]);
 
-  // state to store form input values
   const [title, setTitle] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [rating, setRating] = useState('');
 
-  // loading state to prevent double submit
   const [loading, setLoading] = useState(false);
-
-  // state to store edited ratings (for Update button)
   const [editRatings, setEditRatings] = useState({});
 
-  // fetch problems when component loads
+  // ================= FETCH =================
   useEffect(() => {
     fetchProblems();
   }, []);
 
-  // function to fetch problems from backend
   const fetchProblems = () => {
     fetch('/api/problems')
       .then(res => res.json())
@@ -28,58 +23,42 @@ function App() {
       .catch(err => console.log(err));
   };
 
-  // delete a problem by id
+  // ================= DELETE =================
   const deleteProblem = (id) => {
-    const ok = window.confirm('Are you sure you want to delete this problem?');
-    if (!ok) return;
+    if (!window.confirm('Are you sure you want to delete this problem?')) return;
 
-    fetch(`/api/problems/${id}`, {
-      method: 'DELETE'
-    })
-      .then(res => res.json())
-      .then(() => {
-        fetchProblems();
-      })
+    fetch(`/api/problems/${id}`, { method: 'DELETE' })
+      .then(() => fetchProblems())
       .catch(err => console.log(err));
   };
 
-  // update rating of a problem
+  // ================= UPDATE =================
   const updateRating = (id, newRating) => {
     fetch(`/api/problems/${id}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        rating: Number(newRating)
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating: Number(newRating) })
     })
-      .then(res => res.json())
-      .then(() => {
-        fetchProblems();
-      })
+      .then(() => fetchProblems())
       .catch(err => console.log(err));
   };
 
-  // function runs when form is submitted
+  // ================= CREATE =================
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (loading) return;
+
     setLoading(true);
 
     fetch('/api/problems', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title,
         difficulty,
         rating: Number(rating)
       })
     })
-      .then(res => res.json())
       .then(() => {
         setTitle('');
         setDifficulty('');
@@ -87,16 +66,27 @@ function App() {
         fetchProblems();
       })
       .catch(err => console.log(err))
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   };
 
+  // ================= ANALYTICS =================
+  const normalize = (value) => value?.toLowerCase().trim();
+
+  const easyCount = problems.filter(p => normalize(p.difficulty) === 'easy').length;
+  const mediumCount = problems.filter(p => normalize(p.difficulty) === 'medium').length;
+  const hardCount = problems.filter(p => normalize(p.difficulty) === 'hard').length;
+
+  // ================= UI =================
   return (
     <div>
       <h1>LeetCode Tracker</h1>
 
-      {/* FORM TO ADD A PROBLEM */}
+      {/* ===== Analytics Dashboard ===== */}
+      <div style={{ marginBottom: '15px', fontWeight: 'bold' }}>
+        Analytics → Easy: {easyCount} | Medium: {mediumCount} | Hard: {hardCount}
+      </div>
+
+      {/* ===== Add Problem Form ===== */}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -131,13 +121,12 @@ function App() {
 
       <hr />
 
-      {/* DISPLAY PROBLEMS */}
+      {/* ===== Problems List ===== */}
       <ul>
         {problems.map(problem => (
           <li key={problem._id}>
             {problem.title} - {problem.difficulty} - Rating: {problem.rating}
 
-            {/* rating input */}
             <input
               type="number"
               min="1"
@@ -152,9 +141,8 @@ function App() {
               }
             />
 
-            {/* update button */}
             <button
-               type ="button"
+              type="button"
               style={{ marginLeft: '6px' }}
               onClick={() =>
                 updateRating(
@@ -166,9 +154,8 @@ function App() {
               Update
             </button>
 
-
-            {/* delete button */}
             <button
+              type="button"
               style={{ marginLeft: '6px' }}
               onClick={() => deleteProblem(problem._id)}
             >
