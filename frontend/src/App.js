@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react';
 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell
+} from 'recharts';
+
 function App() {
   // ================= STATES =================
   const [problems, setProblems] = useState([]);
@@ -76,6 +86,14 @@ function App() {
   const mediumCount = problems.filter(p => normalize(p.difficulty) === 'medium').length;
   const hardCount = problems.filter(p => normalize(p.difficulty) === 'hard').length;
 
+  // ===== Chart Data with Colors =====
+  const chartData = [
+    { name: 'Easy', value: easyCount, fill: '#22c55e' },
+    { name: 'Medium', value: mediumCount, fill: '#eab308' },
+    { name: 'Hard', value: hardCount, fill: '#ef4444' },
+  ];
+  // =================================
+
   // ================= UI =================
   return (
     <div className="p-4 max-w-3xl mx-auto">
@@ -102,6 +120,27 @@ function App() {
         </div>
       </div>
 
+      {/* ===== Bar Chart ===== */}
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <h2 className="text-lg font-semibold mb-4">
+          Difficulty Distribution
+        </h2>
+
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData}>
+            <XAxis dataKey="name" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+
+            <Bar dataKey="value">
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
       {/* ===== Add Problem Form ===== */}
       <form onSubmit={handleSubmit} className="mb-6 space-x-2">
         <input
@@ -124,7 +163,6 @@ function App() {
           <option value="Medium">Medium</option>
           <option value="Hard">Hard</option>
         </select>
-
 
         <input
           type="number"
@@ -149,13 +187,12 @@ function App() {
       {/* ===== Problems List ===== */}
       <ul className="space-y-2">
         {problems.map(problem => (
-           <li
-              key={problem._id}
-              className="border p-3 rounded-lg bg-white shadow-sm flex items-center justify-between"
-           >
-
+          <li
+            key={problem._id}
+            className="border p-3 rounded-lg bg-white shadow-sm flex items-center justify-between"
+          >
             <div>
-        <p className="font-semibold">{problem.title}</p>
+              <p className="font-semibold">{problem.title}</p>
               <p className="text-sm text-gray-600">
                 {problem.difficulty} · Rating: {problem.rating}
               </p>
