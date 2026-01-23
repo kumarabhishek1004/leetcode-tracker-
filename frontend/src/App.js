@@ -78,7 +78,8 @@ function App() {
 
   // ================= UI =================
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-3xl mx-auto">
+
       <h1 className="text-3xl font-bold text-blue-600 mb-4">
         LeetCode Tracker
       </h1>
@@ -148,8 +149,17 @@ function App() {
       {/* ===== Problems List ===== */}
       <ul className="space-y-2">
         {problems.map(problem => (
-          <li key={problem._id} className="border p-2 rounded">
-            {problem.title} - {problem.difficulty} - Rating: {problem.rating}
+           <li
+              key={problem._id}
+              className="border p-3 rounded-lg bg-white shadow-sm flex items-center justify-between"
+           >
+
+            <div>
+        <p className="font-semibold">{problem.title}</p>
+              <p className="text-sm text-gray-600">
+                {problem.difficulty} · Rating: {problem.rating}
+              </p>
+            </div>
 
             <input
               type="number"
