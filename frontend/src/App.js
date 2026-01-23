@@ -78,31 +78,52 @@ function App() {
 
   // ================= UI =================
   return (
-    <div>
-      <h1>LeetCode Tracker</h1>
+    <div className="p-4">
+      <h1 className="text-3xl font-bold text-blue-600 mb-4">
+        LeetCode Tracker
+      </h1>
 
       {/* ===== Analytics Dashboard ===== */}
-      <div style={{ marginBottom: '15px', fontWeight: 'bold' }}>
-        Analytics → Easy: {easyCount} | Medium: {mediumCount} | Hard: {hardCount}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-green-100 p-4 rounded-lg text-center">
+          <p className="text-sm text-green-700">Easy</p>
+          <p className="text-2xl font-bold text-green-900">{easyCount}</p>
+        </div>
+
+        <div className="bg-yellow-100 p-4 rounded-lg text-center">
+          <p className="text-sm text-yellow-700">Medium</p>
+          <p className="text-2xl font-bold text-yellow-900">{mediumCount}</p>
+        </div>
+
+        <div className="bg-red-100 p-4 rounded-lg text-center">
+          <p className="text-sm text-red-700">Hard</p>
+          <p className="text-2xl font-bold text-red-900">{hardCount}</p>
+        </div>
       </div>
 
       {/* ===== Add Problem Form ===== */}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="mb-6 space-x-2">
         <input
           type="text"
           placeholder="Problem Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className="border px-2 py-1 rounded"
           required
         />
 
-        <input
-          type="text"
-          placeholder="Difficulty (Easy / Medium / Hard)"
+        <select
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
+          className="border px-2 py-1 rounded"
           required
-        />
+        >
+          <option value="">Select Difficulty</option>
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+
 
         <input
           type="number"
@@ -111,20 +132,23 @@ function App() {
           onChange={(e) => setRating(e.target.value)}
           min="1"
           max="5"
+          className="border px-2 py-1 rounded w-20"
           required
         />
 
-        <button type="submit" disabled={loading}>
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-500 text-white px-3 py-1 rounded"
+        >
           {loading ? 'Adding...' : 'Add Problem'}
         </button>
       </form>
 
-      <hr />
-
       {/* ===== Problems List ===== */}
-      <ul>
+      <ul className="space-y-2">
         {problems.map(problem => (
-          <li key={problem._id}>
+          <li key={problem._id} className="border p-2 rounded">
             {problem.title} - {problem.difficulty} - Rating: {problem.rating}
 
             <input
@@ -132,18 +156,18 @@ function App() {
               min="1"
               max="5"
               value={editRatings[problem._id] ?? problem.rating}
-              style={{ width: '50px', marginLeft: '10px' }}
               onChange={(e) =>
                 setEditRatings({
                   ...editRatings,
                   [problem._id]: e.target.value
                 })
               }
+              className="w-16 border rounded px-2 py-1 ml-2"
             />
 
             <button
               type="button"
-              style={{ marginLeft: '6px' }}
+              className="bg-blue-500 text-white px-3 py-1 rounded ml-2"
               onClick={() =>
                 updateRating(
                   problem._id,
@@ -156,7 +180,7 @@ function App() {
 
             <button
               type="button"
-              style={{ marginLeft: '6px' }}
+              className="bg-red-500 text-white px-3 py-1 rounded ml-2"
               onClick={() => deleteProblem(problem._id)}
             >
               Delete
