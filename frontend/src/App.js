@@ -9,8 +9,7 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
-const API_BASE_URL = "const API_BASE_URL = "https://YOUR-BACKEND-URL.onrender.com";
-";
+const API_BASE_URL = "https://leetcode-tracker-backend-dvx1.onrender.com";
 
 function App() {
   // ================= STATES =================
@@ -28,25 +27,37 @@ function App() {
     fetchProblems();
   }, []);
 
-  const fetchProblems = () => {
-    fetch('/api/problems')
-      .then(res => res.json())
-      .then(data => setProblems(data))
-      .catch(err => console.log(err));
-  };
+  const API_BASE_URL = "https://leetcode-tracker-backend-dvx1.onrender.com";
+
+const fetchProblems = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/problems`);
+
+    if (!res.ok) {
+      throw new Error("Backend not responding");
+    }
+
+    const data = await res.json();
+    setProblems(data);
+  } catch (error) {
+    console.error("Fetch failed:", error);
+    setProblems([]); // prevent crash
+  }
+};
+
 
   // ================= DELETE =================
   const deleteProblem = (id) => {
     if (!window.confirm('Are you sure you want to delete this problem?')) return;
 
-    fetch(`/api/problems/${id}`, { method: 'DELETE' })
+    fetch(`https://leetcode-tracker-backend-dvx1.onrender.com/api/problems/${id}`, { method: 'DELETE' })
       .then(() => fetchProblems())
       .catch(err => console.log(err));
   };
 
   // ================= UPDATE =================
   const updateRating = (id, newRating) => {
-    fetch(`/api/problems/${id}`, {
+    fetch(`https://leetcode-tracker-backend-dvx1.onrender.com/api/problems/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ rating: Number(newRating) })
@@ -62,7 +73,7 @@ function App() {
 
     setLoading(true);
 
-    fetch('/api/problems', {
+    fetch('https://leetcode-tracker-backend-dvx1.onrender.com/api/problems', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
